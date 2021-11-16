@@ -58,7 +58,7 @@ end
 %% Create Panels and Plot
 ref_length = 1;
 NACA = airfoilClass(file,xyAirfoilData,ref_length);
-numPanels = 200;
+numPanels = 160;
 NACA.discretize(numPanels);
 
 % Plot initial airfoil
@@ -67,29 +67,14 @@ NACA.plotPanels('xy','equal');
 NACA.plotNormals;
 
 % Angle of attack
-alpha = 10;
+alpha = 5;
 
 % Calculate CP, CL, M (pitching moment), and velocity
 [CP,CL,M,VEL] = VP(NACA,alpha);
 
-% Plot CP
 figure()
-subplot(2,1,1)
+plotCP(NACA,CP,alpha);
 
-% Plot the rotated airfoil by *alpha* radians
-NACA.panel2xz(deg2rad(alpha));
-NACA.plotPanels('panelCoords');
-
-
-
-% NACA.plotNormals
-subplot(2,1,2)
-NACA.plotPanels('panelCoords');
-
-% Plot CP values 
-plot(NACA.xz.Collocation.x,-CP,'bo'),grid on, grid minor
-% set(gca, 'YDir','reverse')
-% axis equal
 
 
 function [CP,CL,M0,VEL] = VP(airfoilObj,alpha)
@@ -134,7 +119,7 @@ end
 % Apply Kutta B.C.
 b = b';
 A(M-1,:) = 0;
-A(M-1,M-1) = 1;
+A(M-1,M) = 1;
 A(M-1,1) = 1;
 b(M-1) = 0;
 
@@ -145,7 +130,7 @@ G = A\b;
 CL = 0;
 M0 = 0;
 Vinf = 1;
-for i = 2:M
+for i = 1:M
     TEMP = 0;
     for j = 1:M
         TEMP=TEMP+B(i,j)*G(j);
@@ -153,10 +138,12 @@ for i = 2:M
     VEL(i)=TEMP+cos(AL)*cos(airfoilObj.Phi(i))+sin(AL)*sin(airfoilObj.Phi(i));
     CL=CL+VEL(i)*airfoilObj.PanelSize(i);
     CP(i) = 1-((VEL(i)+VEL(i-1))/2/Vinf)^2;
+%     CP(i) = 1-VEL(i)^2;
     
 % %     M0 = M0 + VEL(i)*DL(i)*airfoilObj.xz.Collocation.x(i)*cos(airfoilObj.Phi(i));
     
 end
+airfoilObj.CP = CP;
 M0 = sum(CP.*airfoilObj.xz.Collocation.x.*airfoilObj.PanelSize.*cos(airfoilObj.Phi));
 fprintf(['Results with ',num2str(length(airfoilObj.Phi)),' panels at ',num2str(alpha),...
     ' degrees angle of ','attack:\nCL = ',num2str(CL),'\n'])
@@ -178,6 +165,46 @@ TH2 = atan2(Z,X-X2);
 up = (1/(2*pi))*(TH2-TH1);
 wp = (1/(2*pi))*log(R2/R1);
 
+
+end
+
+function plotCP(airfoilObj,CP,alpha)
+
+subplot(2,1,1)
+
+% Plot the rotated airfoil by *alpha* radians
+airfoilObj.panel2xz(deg2rad(alpha));
+airfoilObj.plotPanels('panelCoords');
+
+% Determine vector of top panels
+botInd = 1;
+topInd = 1;
+for i = 1:length(CP)
+    zCoord = airfoilObj.xz.Collocation.z(i);
+    
+    if sign(zCoord) == -1
+        botVec(botInd,1) = CP(i);
+        botVec(botInd,2) = airfoilObj.xz.Collocation.x(i);
+        botInd = botInd+1;
+    else
+        topVec(topInd,1) = CP(i);
+        topVec(topInd,2) = airfoilObj.xz.Collocation.x(i);
+        topInd = topInd+1;
+    end
+    
+end
+
+% Determine vector of bottom panels
+
+
+subplot(2,1,2)
+% Plot CP values 
+% plot(airfoilObj.xz.Collocation.x,CP,'b-o','markersize',3,'markerfacecolor','b'),grid on, grid minor
+plot(botVec(:,2),botVec(:,1),'r-o','markersize',3,'markerfacecolor','b'),hold on
+plot(topVec(:,2),topVec(:,1),'b-o','markersize',3,'markerfacecolor','b'),grid on, grid minor
+legend('Bottom','Top','location','best')
+set(gca, 'YDir','reverse')
+% axis equal
 
 end
 

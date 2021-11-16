@@ -2,8 +2,7 @@ classdef airfoilClass < handle
     %airfoil - This class stores mid-points, end-points, cP graph, panel
     %angles, etc
     %   Detailed explanation goes here
-    %%%%%%%%%%%%%%%%%%%%%%%%%% ANGLE PHI MAYBE NOT GETTING CALCULATED
-    %%%%%%%%%%%%%%%%%%%%%%%%%% CORRECTLY
+
     properties
         xz = struct('Coords',{},'Collocation',{},'Endpoints',{},'NormPanels',{});
         panelCoords  = struct('Coords',{},'Collocation',{},...
@@ -14,7 +13,8 @@ classdef airfoilClass < handle
         Betas
         RefLength
         Phi
-        PanelSize   
+        PanelSize  
+        CP
     end
     properties (Dependent)
         Phis
@@ -53,7 +53,7 @@ classdef airfoilClass < handle
             obj.panelCoords.NormPanels = rotMat*[obj.xz.NormPanels.x;...
                 obj.xz.NormPanels.z]';
         end
-        % Not really working correctly
+        
         function coords = xz2panel(obj,alpha)
             xz_coords = obj.xz.Coords;
             rotMat = [cos(alpha) -sin(alpha);
@@ -86,11 +86,27 @@ classdef airfoilClass < handle
             foilpointsClockwise(:,2) = flipud(foilPoints(:,2));
 
             obj.xz(1).Coords = foilpointsClockwise;      
+            obj.panelCoords(1).Coords = foilpointsClockwise;
         end
  
         % Discretization good
         function obj = discretize(obj,numPanels)
-            obj.NumPanels = numPanels;
+            
+            % Clear Variables
+            obj.xz.Collocation = {};
+            obj.xz.Endpoints = {};
+            obj.xz.NormPanels = {};
+            obj.PanelSize = [];
+            obj.Phi = [];
+            
+            
+            obj.panelCoords.Collocation = {};
+            obj.panelCoords.Endpoints = {};
+            obj.panelCoords.NormPanels = {};
+
+        
+        
+ 
             %METHOD1 Summary of this method goes here
             %   Detailed explanation goes here
             if length(obj.xz.Coords(:,1)) < obj.NumPanels
@@ -221,6 +237,7 @@ classdef airfoilClass < handle
 %                 obj.FigHandle = fig;
             end
         end
+       
         
         % Plot normals works
         function plotNormals(obj)
@@ -229,6 +246,59 @@ classdef airfoilClass < handle
             for i = 1:length(obj.xz.NormPanels.x)
             plot(obj.xz.NormPanels.x(i,:)./obj.RefLength,obj.xz.NormPanels.z(i,:)./obj.RefLength,'k')
             legend off
+            end
+        end
+        
+        
+        %% Features for MATLAB App integration
+        
+        function plotNormalsApp(obj,appAxes)
+%     
+            for i = 1:length(obj.xz.NormPanels.x)
+                plot(appAxes,obj.xz.NormPanels.x(i,:)./obj.RefLength,obj.xz.NormPanels.z(i,:)./obj.RefLength,'k')
+            end
+        end
+        function plotPanelsApp(obj,appAxes,plotKey,varargin)
+           
+%             fig = figure();
+            ref_length = obj.RefLength;
+            if strcmp(plotKey,'xy') == 1
+                hold(appAxes,'off')
+                plot(appAxes,obj.xz.Coords(:,1)./ref_length,obj.xz.Coords(:,2)./ref_length,'r-','linewidth',3)
+                hold(appAxes,'on')
+                plot(appAxes,obj.xz.Endpoints.x./ref_length,obj.xz.Endpoints.z./ref_length,'g-','linewidth',2)
+                plot(appAxes,obj.xz.Collocation.x./ref_length,obj.xz.Collocation.z./ref_length,'ko',...
+                    'markerfacecolor','k','markersize',2)
+
+                title(appAxes,obj.FoilName)
+
+                
+                if size(varargin,1) >= 1
+                    if strcmp(varargin{1},'equal') == 1
+                        axis(appAxes, 'equal');
+                    end
+                end
+                fill(appAxes,obj.xz.Endpoints.x./ref_length,obj.xz.Endpoints.z./ref_length,'g')
+%                 obj.FigHandle = fig;
+            end
+            
+            if strcmp(plotKey,'panelCoords') == 1
+                hold(appAxes,'off')
+                plot(appAxes,obj.panelCoords.Coords(:,1),obj.panelCoords.Coords(:,2),'r-','linewidth',3)
+                hold(appAxes,'on')
+                plot(appAxes,obj.panelCoords.Endpoints(1,:),obj.panelCoords.Endpoints(2,:),'g-','linewidth',2)
+                plot(appAxes,obj.panelCoords.Collocation(1,:),obj.panelCoords.Collocation(2,:),'ko',...
+                    'markerfacecolor','k','markersize',2)
+                title(appAxes,obj.FoilName)
+   
+                if size(varargin,1) >= 1
+                    if strcmp(varargin{1},'equal') == 1
+                        axis(appAxes, 'equal');
+                    end
+                end
+%                 axis equal
+                fill(appAxes,obj.panelCoords.Endpoints(1,:),obj.panelCoords.Endpoints(2,:),'g')
+%                 obj.FigHandle = fig;
             end
         end
         
