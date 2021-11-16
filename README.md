@@ -13,7 +13,7 @@ Input and airfoil .dat file to analyze the _**C<sub>p</sub>**_ distribution as w
 4. At the tob, a tab labeled "Panel View" provides a view of the airfoil as well as the _**C<sub>p</sub>**_ distribution.
 5. Enter and angle of attack value or use the slider to select a value. The plots will update based on the selection.
 
-![Alt text](/Screenshots/appInUse.PNG?raw=true "Using the VPM App")
+![Alt text](/Screenshots/airfoilGif.gif?raw=true "Using the VPM App")
 
 
 ## Getting Started
