@@ -1,62 +1,40 @@
-# Project Title
+# Constant Strength Vortex Panel Method
 
-Simple overview of use/purpose.
+This app allows users to input an airfoil datafile and analyze the pressure distribution of an airfoil using the constant strength vortex panel method. Results are displayed graphically in the MATLAB application.
 
 ## Description
 
-An in-depth paragraph about your project and overview of use.
+Input and airfoil .dat file to analyze the _**C<sub>p</sub>**_ distribution as well as _**C<sub>L</sub>**_ and _**C<sub>M</sub>**_. To get started, download and open _airfoilApp.mlapp_.
+
+1. Navigate to the directory containing your airfoil .dat files:
+2. Select the airfoil file that is desired and click "Upload".
+3. Enter the number of panels desired or use the slider bar to change the panel discretization.
+   * Note: The max number of panels is constrained to the number of datapoints in the .dat file. The software does not interpolate between panel coordinate indices.
+4. At the tob, a tab labeled "Panel View" provides a view of the airfoil as well as the _**C<sub>p</sub>**_ distribution.
+5. Enter and angle of attack value or use the slider to select a value. The plots will update based on the selection.
 
 ## Getting Started
 
 ### Dependencies
 
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
+* MATLAB
 
 ### Installing
 
-* How/where to download your program
-* Any modifications needed to be made to files/folders
 
 ### Executing program
 
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
-
-## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
+* run airfoilApp.mlapp
 
 ## Authors
 
 Contributors names and contact info
 
-ex. Dominique Pizzie  
-ex. [@DomPizzie](https://twitter.com/dompizzie)
+Aaron Mandeville  
+[@aaronmandeville](https://www.linkedin.com/in/aaronmandeville/)
+aaronmandeville@gmail.com
 
-## Version History
-
-* 0.2
-    * Various bug fixes and optimizations
-    * See [commit change]() or See [release history]()
-* 0.1
-    * Initial Release
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
-
-## Acknowledgments
-
-Inspiration, code snippets, etc.
-* [awesome-readme](https://github.com/matiassingers/awesome-readme)
-* [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
-* [dbader](https://github.com/dbader/readme-template)
-* [zenorocha](https://gist.github.com/zenorocha/4526327)
-* [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
+This project is licensed under the MIT License - see the LICENSE.md file for details
